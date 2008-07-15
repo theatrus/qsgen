@@ -32,6 +32,45 @@ import shutil
 from mako.template import Template
 from mako.lookup import TemplateLookup
 
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import HtmlFormatter
+
+# Support library
+
+
+def pygment(string, lexer = 'python', linenos = False):
+    lexer = get_lexer_by_name(lexer)
+    formatter = HtmlFormatter(linenos = linenos)
+    res = highlight(string, lexer, formatter)
+    return res
+
+def pygment_file(file, *args, **kwargs):
+    f = open(file, 'r')
+    lines = f.readlines()
+    f.close()
+    s = "".join(lines)
+    return pygment(s, *args, **kwargs)
+
+
+def pygment_style():
+    return u"<style type=\"text/css\">" + HtmlFormatter().get_style_defs('.highlight') + u"</style>"
+
+
+
+def templateize(file, out_path):
+    mlook = TemplateLookup(directories = ['.'])
+    templ = mlook.get_template(file)
+
+    actions = {
+        'pygment' : pygment,
+        'pygment_file' : pygment_file,
+        'pygment_style' : pygment_style
+        }
+
+    f = open( os.path.join(out_path, file), 'w')
+    print >> f, templ.render_unicode(**actions).encode('UTF-8')
+    f.close()
 
 def main():
     if len(sys.argv) < 2:
@@ -49,7 +88,7 @@ def main():
     os.chdir(src_path)
     print "qsgen: ",src_path,"to",out_path
 
-    mlook = TemplateLookup(directories = ['.'])
+
 
     for root, dirs, files in os.walk('.'):
         for file in files:
@@ -73,10 +112,7 @@ def main():
                 print '[copy] ->', os.path.join(out_path, file)
                 continue
 
-            templ = mlook.get_template(file)
-            f = open( os.path.join(out_path, file), 'w')
-            print >> f, templ.render_unicode().encode('UTF-8')
-            f.close()
+            templateize(file, out_path)
             print '[templ]'
 
 main()
