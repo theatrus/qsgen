@@ -1,0 +1,50 @@
+qsgen
+=====
+
+qsgen is a Python static site generator. It uses a set of
+Mako input templates and outputs a static site. qsgen also has builtin
+support for code documentation and commenting with highlight generation
+using Pygments
+
+== Installing ==
+
+ python setup.py install
+
+All dependencies should be dealt with automatically.
+
+== Features ==
+
+ * Mako templating - by default all .html files are transformed by
+  Mako
+
+ * Pygments syntax highlighting builtin via ${pygment("print
+  'Hi'")} or file references via pygment_file
+
+ * Copies non-transformed files into the destination directory
+  directly.
+
+ * No configuration files to write, no rigid structure to follow.
+
+
+== Usage ==
+
+qsgen accepts only two command line parameters - the desination
+directory, and optionally the source directory.
+
+
+ qsgen /var/www /home/user/sitesource
+
+
+qsgen will attempt to copy all files which are not .html files. It
+will also by default NOT copy files beginning with an underscore
+(_base.html for instance), which it considers to be private templating
+files. This closely mimics Python's approach to 'private' class
+methods.
+
+
+
+== Example Site Source ==
+
+Look at the source for tomeapi.com, available at
+http://git.stackfoundry.com/cgi-bin/gitweb.cgi?p=www/tomeapi-site.git;a=summary
+
