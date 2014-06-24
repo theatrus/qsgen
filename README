@@ -40,11 +40,3 @@ will also by default NOT copy files beginning with an underscore
 (_base.html for instance), which it considers to be private templating
 files. This closely mimics Python's approach to 'private' class
 methods.
-
-
-
-== Example Site Source ==
-
-Look at the source for tomeapi.com, available at
-http://git.stackfoundry.com/cgi-bin/gitweb.cgi?p=www/tomeapi-site.git;a=summary
-
