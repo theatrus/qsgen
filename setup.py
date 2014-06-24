@@ -5,7 +5,7 @@ from setuptools import setup
 
 
 setup(name = 'qsgen',
-      version = '0.2',
+      version = '0.3',
       description = 'An HTML static site generator for Mako',
       author = 'Yann Ramin',
       install_requires = ['Mako', 'Pygments'],

@@ -38,39 +38,64 @@ from pygments.formatters import HtmlFormatter
 
 # Support library
 
-
 def pygment(string, lexer = 'python', linenos = False):
-    lexer = get_lexer_by_name(lexer)
-    formatter = HtmlFormatter(linenos = linenos)
-    res = highlight(string, lexer, formatter)
-    return res
+  lexer = get_lexer_by_name(lexer)
+  formatter = HtmlFormatter(linenos = linenos)
+  res = highlight(string, lexer, formatter)
+  return res
 
 def pygment_file(file, *args, **kwargs):
-    f = open(file, 'r')
-    lines = f.readlines()
-    f.close()
-    s = "".join(lines)
-    return pygment(s, *args, **kwargs)
-
+  f = open(file, 'r')
+  lines = f.readlines()
+  f.close()
+  s = "".join(lines)
+  return pygment(s, *args, **kwargs)
 
 def pygment_style():
-    return u"<style type=\"text/css\">" + HtmlFormatter().get_style_defs('.highlight') + u"</style>"
+  return u"<style type=\"text/css\">" + HtmlFormatter().get_style_defs('.highlight') + u"</style>"
 
 
 
 def templateize(file, out_path):
-    mlook = TemplateLookup(directories = ['.'])
-    templ = mlook.get_template(file)
+  mlook = TemplateLookup(directories = ['.'])
+  templ = mlook.get_template(file)
 
-    actions = {
-        'pygment' : pygment,
-        'pygment_file' : pygment_file,
-        'pygment_style' : pygment_style
-        }
+  actions = {
+    'pygment' : pygment,
+    'pygment_file' : pygment_file,
+    'pygment_style' : pygment_style
+  }
 
-    f = open( os.path.join(out_path, file), 'w')
-    print >> f, templ.render_unicode(**actions).encode('UTF-8')
-    f.close()
+  f = open( os.path.join(out_path, file), 'w')
+  print >> f, templ.render_unicode(**actions).encode('UTF-8')
+  f.close()
+
+
+def generate(out_path, root, file):
+  try:
+    os.makedirs(os.path.join(out_path, root))
+  except:
+    pass
+  file = os.path.join(root, file)
+  print file,
+
+  if file[-4:] != 'html':
+    shutil.copyfile(file, os.path.join(out_path, file))
+    print '[copy] ->', os.path.join(out_path, file)
+  else:
+    templateize(file, out_path)
+    print '[templ]'
+
+
+def scan(out_path, src):
+  for root, dirs, files in os.walk(src):
+    for file in files:
+      # Skip some common file extensions which shouldn't be copied
+      if file[0] == '_':
+        continue
+      if file[-1] == '~':
+        continue
+      generate(out_path, root, file)
 
 def main():
     if len(sys.argv) < 2:
@@ -87,32 +112,8 @@ def main():
 
     os.chdir(src_path)
     print "qsgen: ",src_path,"to",out_path
+    scan(out_path, src_path)
 
 
-
-    for root, dirs, files in os.walk('.'):
-        for file in files:
-
-            # Skip some common file extensions which shouldn't be copied
-
-            if file[0] == '_':
-                continue
-            if file[-1] == '~':
-                continue
-
-
-            try:
-                os.makedirs(os.path.join(out_path, root))
-            except:
-                pass
-            file = os.path.join(root, file)
-            print file,
-            if file[-4:] != 'html':
-                shutil.copyfile(file, os.path.join(out_path, file))
-                print '[copy] ->', os.path.join(out_path, file)
-                continue
-
-            templateize(file, out_path)
-            print '[templ]'
-
-main()
+if __name__ == "__main__":
+  main()
