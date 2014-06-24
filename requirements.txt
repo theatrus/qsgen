@@ -1,0 +1,4 @@
+Mako==1.0.0
+MarkupSafe==0.23
+Pygments==1.6
+wsgiref==0.1.2
